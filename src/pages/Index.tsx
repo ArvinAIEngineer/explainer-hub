@@ -1,219 +1,164 @@
 import { DocLayout } from "@/components/DocLayout";
 import { DocSection, DocContent } from "@/components/DocSection";
-import { CodeBlock } from "@/components/CodeBlock";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Database, Server, MessageSquare, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Index = () => {
-  const sampleCode1 = `// Multi-agent system configuration
-const agentConfig = {
-  coordinator: {
-    name: "TaskCoordinator",
-    role: "orchestrate",
-    capabilities: ["planning", "delegation", "monitoring"]
-  },
-  workers: [
-    {
-      name: "DataProcessor",
-      role: "process",
-      capabilities: ["etl", "validation", "transformation"]
-    },
-    {
-      name: "APIAgent",
-      role: "communicate",
-      capabilities: ["rest", "graphql", "websocket"]
-    }
-  ]
-};
+const navigation = [
+  { id: "overview", label: "Overview", href: "#overview" },
+  { id: "architecture", label: "Architecture", href: "#architecture" },
+  { id: "components", label: "Components", href: "#components" },
+  { id: "getting-started", label: "Getting Started", href: "#getting-started" },
+];
 
-export default agentConfig;`;
-
-  const sampleCode2 = `class AgentEngine {
-  constructor(config) {
-    this.agents = new Map();
-    this.messageQueue = new EventEmitter();
-    this.config = config;
-  }
-
-  async initializeAgents() {
-    // Create coordinator agent
-    const coordinator = new Agent(this.config.coordinator);
-    this.agents.set('coordinator', coordinator);
-    
-    // Create worker agents
-    for (const workerConfig of this.config.workers) {
-      const worker = new Agent(workerConfig);
-      this.agents.set(workerConfig.name, worker);
-    }
-    
-    // Setup communication channels
-    this.setupMessageRouting();
-  }
-
-  setupMessageRouting() {
-    this.messageQueue.on('task', (task) => {
-      const coordinator = this.agents.get('coordinator');
-      coordinator.handleTask(task);
-    });
-  }
-}`;
-
-  const sampleCode3 = `// Deployment configuration for Google Cloud
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: agent-engine
-  labels:
-    app: agent-engine
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: agent-engine
-  template:
-    metadata:
-      labels:
-        app: agent-engine
-    spec:
-      containers:
-      - name: agent-engine
-        image: gcr.io/project/agent-engine:latest
-        ports:
-        - containerPort: 8080
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: redis-secret
-              key: url`;
-
+export default function Index() {
   return (
-    <DocLayout title="Multi-Agent System Documentation">
-      <DocSection title="Deploying a Multi-Agent System in Agent Engine" id="overview">
+    <DocLayout title="Code Documentation System" navigation={navigation}>
+      <DocSection title="System Overview" id="overview">
         <DocContent>
-          <p className="text-lg leading-8 mb-6">
-            In this comprehensive guide, we'll walk through the process of deploying a sophisticated 
-            multi-agent system using Agent Engine on Google Cloud Platform. This system demonstrates 
-            how multiple AI agents can work together to solve complex problems through coordinated 
-            task distribution and real-time communication.
-          </p>
-          
-          <p className="mb-4">
-            Multi-agent systems represent a paradigm shift in how we approach distributed computing 
-            and AI problem-solving. Rather than relying on a single monolithic system, we can 
-            leverage multiple specialized agents, each with distinct capabilities and responsibilities.
-          </p>
+          Welcome to the comprehensive documentation for our multi-component system. 
+          This documentation covers three main components: Data Pipeline (n8n/JSON), 
+          FastAPI Backend, and Slack Bolt Frontend with modular features.
         </DocContent>
       </DocSection>
 
-      <DocSection title="System Architecture Overview" id="getting-started">
+      <DocSection title="System Architecture" id="architecture">
         <DocContent>
-          <p className="mb-4">
-            Our multi-agent system consists of three main components: a coordinator agent that 
-            orchestrates tasks, and multiple worker agents that handle specific functionalities. 
-            Let's start by examining the basic configuration structure:
-          </p>
+          Our system follows a microservices architecture with clear separation of concerns:
         </DocContent>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
+          <Card className="border-border bg-gradient-to-br from-card via-card to-muted/20">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-gradient-to-r from-primary/20 to-accent/20">
+                  <Database className="h-5 w-5 text-primary" />
+                </div>
+                <CardTitle className="text-foreground">Data Pipeline</CardTitle>
+              </div>
+              <CardDescription>n8n workflows with JSON processing</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Handles data ingestion, transformation, and routing using n8n automation platform.
+              </p>
+              <Link to="/data-pipeline">
+                <Button variant="outline" size="sm" className="w-full group">
+                  View Details 
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
 
-        <CodeBlock 
-          code={sampleCode1}
-          language="javascript"
-          title="agent-config.js"
-        />
+          <Card className="border-border bg-gradient-to-br from-card via-card to-muted/20">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-gradient-to-r from-secondary/20 to-primary/20">
+                  <Server className="h-5 w-5 text-secondary" />
+                </div>
+                <CardTitle className="text-foreground">Backend API</CardTitle>
+              </div>
+              <CardDescription>FastAPI single-file architecture</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                RESTful API built with FastAPI providing all backend functionality in a single file.
+              </p>
+              <Link to="/backend">
+                <Button variant="outline" size="sm" className="w-full group">
+                  View Details 
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
 
-        <DocContent>
-          <p className="mb-4">
-            The configuration above defines our agent hierarchy. The <code className="bg-code-bg px-2 py-1 rounded text-syntax-keyword">coordinator</code> 
-            agent acts as the central orchestrator, while worker agents handle specialized tasks like 
-            data processing and API communication.
-          </p>
-          
-          <p className="mb-4">
-            Each agent has defined <code className="bg-code-bg px-2 py-1 rounded text-syntax-string">capabilities</code> 
-            that determine what types of tasks they can handle. This modular approach allows for 
-            easy scaling and maintenance of the system.
-          </p>
-        </DocContent>
+          <Card className="border-border bg-gradient-to-br from-card via-card to-muted/20">
+            <CardHeader>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 rounded-lg bg-gradient-to-r from-accent/20 to-secondary/20">
+                  <MessageSquare className="h-5 w-5 text-accent" />
+                </div>
+                <CardTitle className="text-foreground">Slack Frontend</CardTitle>
+              </div>
+              <CardDescription>Modular Slack Bolt application</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Slack bot with 6 independent features, each in separate Python files with main.py orchestration.
+              </p>
+              <Link to="/frontend">
+                <Button variant="outline" size="sm" className="w-full group">
+                  View Details 
+                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
       </DocSection>
 
-      <DocSection title="Implementing the Agent Engine" id="examples">
+      <DocSection title="Key Components" id="components">
         <DocContent>
-          <p className="mb-4">
-            Now let's implement the core AgentEngine class that will manage our multi-agent system. 
-            This class handles agent initialization, message routing, and task coordination:
-          </p>
+          Each component serves a specific purpose in the overall system:
         </DocContent>
-
-        <CodeBlock 
-          code={sampleCode2}
-          language="javascript"
-          title="AgentEngine.js"
-        />
-
-        <DocContent>
-          <p className="mb-4">
-            The <code className="bg-code-bg px-2 py-1 rounded text-syntax-function">AgentEngine</code> class 
-            serves as the backbone of our system. Here's what each method does:
-          </p>
-          
-          <ul className="list-disc pl-6 space-y-2 mb-4">
-            <li><strong>Constructor:</strong> Initializes the engine with configuration and sets up core data structures</li>
-            <li><strong>initializeAgents():</strong> Creates and configures all agents based on the provided configuration</li>
-            <li><strong>setupMessageRouting():</strong> Establishes communication channels between agents</li>
-          </ul>
-
-          <p className="mb-4">
-            The use of <code className="bg-code-bg px-2 py-1 rounded text-syntax-keyword">EventEmitter</code> 
-            for the message queue ensures that agents can communicate asynchronously, which is crucial 
-            for maintaining system responsiveness under load.
-          </p>
-        </DocContent>
-      </DocSection>
-
-      <DocSection title="Deployment Configuration" id="api">
-        <DocContent>
-          <p className="mb-4">
-            Finally, let's look at how to deploy this system to Google Cloud using Kubernetes. 
-            The following configuration ensures scalability and reliability in production:
-          </p>
-        </DocContent>
-
-        <CodeBlock 
-          code={sampleCode3}
-          language="yaml"
-          title="deployment.yaml"
-        />
-
-        <DocContent>
-          <p className="mb-4">
-            This Kubernetes deployment configuration includes several important features:
-          </p>
-          
-          <ul className="list-disc pl-6 space-y-2 mb-4">
-            <li><strong>Replicas:</strong> We deploy 3 instances for high availability</li>
-            <li><strong>Environment Variables:</strong> Proper configuration for production deployment</li>
-            <li><strong>Secrets Management:</strong> Secure handling of sensitive data like Redis URLs</li>
-            <li><strong>Port Configuration:</strong> Exposing the service on port 8080</li>
-          </ul>
-
-          <p className="mb-6">
-            To deploy this system, simply apply the configuration using:
-          </p>
-
-          <div className="bg-code-bg border border-code-border rounded-lg p-4 mb-6">
-            <code className="text-code-foreground font-mono">kubectl apply -f deployment.yaml</code>
+        
+        <div className="space-y-6 my-8">
+          <div className="p-6 rounded-lg border border-border bg-gradient-to-r from-muted/10 to-muted/5">
+            <h3 className="text-lg font-semibold text-foreground mb-3 bg-gradient-primary bg-clip-text text-transparent">
+              🔄 Data Pipeline Features
+            </h3>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>• n8n workflow automation and orchestration</li>
+              <li>• JSON data processing and validation</li>
+              <li>• Data transformation and routing</li>
+              <li>• Error handling and monitoring</li>
+            </ul>
           </div>
+          
+          <div className="p-6 rounded-lg border border-border bg-gradient-to-r from-muted/10 to-muted/5">
+            <h3 className="text-lg font-semibold text-foreground mb-3 bg-gradient-primary bg-clip-text text-transparent">
+              ⚡ Backend API Features
+            </h3>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>• RESTful API endpoints for all operations</li>
+              <li>• Authentication and authorization</li>
+              <li>• Database models and operations</li>
+              <li>• Middleware for logging and error handling</li>
+            </ul>
+          </div>
+          
+          <div className="p-6 rounded-lg border border-border bg-gradient-to-r from-muted/10 to-muted/5">
+            <h3 className="text-lg font-semibold text-foreground mb-3 bg-gradient-primary bg-clip-text text-transparent">
+              💬 Slack Frontend Features
+            </h3>
+            <ul className="space-y-2 text-muted-foreground">
+              <li>• User Management - Registration and profiles</li>
+              <li>• Message Handler - Smart message processing</li>
+              <li>• Channel Monitor - Activity tracking and analytics</li>
+              <li>• File Processor - File upload and processing</li>
+              <li>• Analytics - Usage metrics and insights</li>
+              <li>• Notifications - User notification system</li>
+            </ul>
+          </div>
+        </div>
+      </DocSection>
 
-          <p className="mb-4">
-            This deployment strategy ensures that your multi-agent system can handle production 
-            workloads while maintaining fault tolerance and scalability. The agents will 
-            automatically discover each other and begin coordinating tasks according to your 
-            configuration.
-          </p>
+      <DocSection title="Getting Started" id="getting-started">
+        <DocContent>
+          To explore the documentation for each component, use the navigation above or click the component cards. 
+          Each section provides detailed code examples, API references, and implementation guides.
         </DocContent>
+        
+        <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg border border-primary/20">
+          <p className="text-sm text-foreground">
+            💡 <strong>Tip:</strong> Start with the component you're most interested in, or follow the data flow from 
+            Data Pipeline → Backend → Frontend for a complete understanding of the system.
+          </p>
+        </div>
       </DocSection>
     </DocLayout>
   );
-};
-
-export default Index;
+}
