@@ -33,7 +33,7 @@ export default function Backend() {
         <DocContent>
           The routes layer defines the API surface. A key architectural choice was to use a single, unified endpoint (`/api/influencer/query`). This acts as a gateway that routes requests to the appropriate service based on the `source` parameter in the request payload.
           <br/><br/>
-          <strong>CTO Insight:</strong> This single-endpoint design creates a stable API contract, simplifying frontend integration. It allows the backend to evolve and add new data `sources` or `views` without requiring changes to the endpoint URI, which enhances long-term maintainability.
+          <strong> Insight:</strong> This single-endpoint design creates a stable API contract, simplifying frontend integration. It allows the backend to evolve and add new data `sources` or `views` without requiring changes to the endpoint URI, which enhances long-term maintainability.
         </DocContent>
         <CodeBlock
           title="app/routes.py"
@@ -68,7 +68,7 @@ def handle_influencer_query():
         <DocContent>
           This layer acts as the bridge to the Supabase database. It abstracts away all database interactions, constructing and executing queries dynamically based on filters from the request payload. It queries pre-defined, performant SQL Views (e.g., `all_influencer_campaigns`) for efficiency and returns the raw data as a Pandas DataFrame, ready for processing.
           <br/><br/>
-          <strong>CTO Insight:</strong> This abstraction decouples the business logic from the data access mechanism. Querying views instead of raw tables is a best practice that improves security and performance.
+          <strong> Insight:</strong> This abstraction decouples the business logic from the data access mechanism. Querying views instead of raw tables is a best practice that improves security and performance.
         </DocContent>
         <CodeBlock
           title="app/services/data_service.py"
@@ -102,7 +102,7 @@ def handle_influencer_query():
         <DocContent>
           This is the core of Lyra's intelligence. It contains all business logic and uses Pandas for high-performance in-memory data transformation. The `route_analytics_processing` function acts as a sub-router, delegating the DataFrame to the appropriate analytical function based on the requested `view`. This module handles complex logic like multi-currency aggregation for Nordics markets and performance-based influencer tiering.
           <br/><br/>
-          <strong>CTO Insight:</strong> This design follows the Strategy Pattern, where different analytical "strategies" (e.g., `_influencer_process_summary`, `_influencer_process_discovery_tiers`) can be added or modified without affecting the core data fetching logic. Using Pandas is ideal for this kind of vectorized computation and complex data manipulation.
+          <strong> Insight:</strong> This design follows the Strategy Pattern, where different analytical "strategies" (e.g., `_influencer_process_summary`, `_influencer_process_discovery_tiers`) can be added or modified without affecting the core data fetching logic. Using Pandas is ideal for this kind of vectorized computation and complex data manipulation.
         </DocContent>
         <CodeBlock
           title="Processing Service - Request Routing"
@@ -152,7 +152,7 @@ def handle_influencer_query():
         <DocContent>
           The backend is supported by a suite of unit tests using `pytest` and `pytest-mock`. The tests cover both the API routes (ensuring correct status codes and responses) and the complex data transformations in the processing service.
           <br/><br/>
-          <strong>CTO Insight:</strong> A dedicated testing suite demonstrates a commitment to code quality, reliability, and maintainability. It proves the system is not just a prototype but a robust application ready for a CI/CD pipeline.
+          <strong> Insight:</strong> A dedicated testing suite demonstrates a commitment to code quality, reliability, and maintainability. It proves the system is not just a prototype but a robust application ready for a CI/CD pipeline.
         </DocContent>
         <CodeBlock
           title="tests_backend/test_processing_service.py"
