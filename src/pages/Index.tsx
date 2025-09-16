@@ -76,7 +76,7 @@ export default function Index() {
               <p className="text-sm text-muted-foreground mb-4">
                 The computational core of the system. Lyra performs complex calculations, currency conversions, and data aggregations, exposing insights via a REST API.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="flex flex-col space-y-2 mt-4">
                 <Link to="/backend">
                   <Button variant="outline" size="sm" className="w-full group">
                     View Backend Details 
@@ -107,7 +107,7 @@ export default function Index() {
               <p className="text-sm text-muted-foreground mb-4">
                 An intelligent Slack bot that understands natural language queries, fetches data from Lyra, and delivers AI-generated analysis and reports to users.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="flex flex-col space-y-2 mt-4">
                 <Link to="/frontend">
                   <Button variant="outline" size="sm" className="w-full group">
                     View Frontend Details 
