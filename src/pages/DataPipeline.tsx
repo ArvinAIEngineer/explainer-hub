@@ -1,6 +1,9 @@
 import { DocLayout } from "@/components/DocLayout";
 import { DocSection, DocContent } from "@/components/DocSection";
 import { CodeBlock } from "@/components/CodeBlock";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const navigation = [
   { id: "overview", label: "Overview", href: "#overview" },
@@ -12,6 +15,13 @@ const navigation = [
 export default function DataPipeline() {
   return (
     <DocLayout title="Data Pipeline Architecture" navigation={navigation}>
+      <Link to="/" className="mb-8 inline-block">
+        <Button variant="outline">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Overview
+        </Button>
+      </Link>
+      
       <DocSection title="Pipeline Overview" id="overview">
         <DocContent>
           The data pipeline is the foundation of the entire system, responsible for the automated Extraction, Transformation, and Loading (ETL) of influencer marketing data. It ensures that clean, up-to-date information is available for analysis every day. The flow is designed for robustness and reliability, moving data seamlessly from a client-facing spreadsheet to our structured database.
