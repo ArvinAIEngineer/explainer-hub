@@ -4,288 +4,109 @@ import { CodeBlock } from "@/components/CodeBlock";
 
 const navigation = [
   { id: "overview", label: "Overview", href: "#overview" },
-  { id: "main-app", label: "Main App", href: "#main-app" },
-  { id: "feature-1", label: "User Management", href: "#feature-1" },
-  { id: "feature-2", label: "Message Handler", href: "#feature-2" },
-  { id: "feature-3", label: "Channel Monitor", href: "#feature-3" },
-  { id: "feature-4", label: "Additional Features", href: "#feature-4" },
+  { id: "core-logic", label: "Core Logic (main.py)", href: "#core-logic" },
+  { id: "monthly-module", label: "Monthly Module (month.py)", href: "#monthly-module" },
+  { id: "influencer-module", label: "Influencer Module (influencer.py)", href: "#influencer-module" },
+  { id: "planning-module", label: "Planning Module (plan.py)", href: "#planning-module" },
 ];
 
 export default function Frontend() {
   return (
-    <DocLayout title="Slack Bolt Frontend Documentation" navigation={navigation}>
-      <DocSection title="Frontend Overview" id="overview">
+    <DocLayout title="Nova: The Conversational Frontend" navigation={navigation}>
+      <DocSection title="Nova Overview" id="overview">
         <DocContent>
-          The frontend is built using Slack Bolt framework with a modular architecture. 
-          Each feature is implemented in its own Python file with a main.py orchestrating 
-          all components. This approach ensures maintainability and allows for independent 
-          development of features.
+          Nova is the user-facing component of the platform, implemented as a sophisticated Slack bot using the Slack Bolt framework. It serves as an intelligent conversational interface, allowing users to query complex marketing data using natural language. Nova's primary innovation lies in its use of a Large Language Model (Google's Gemini) to understand user intent, fetch structured data from the Lyra backend, and then generate insightful, human-readable analysis. The application is modular, with each core capability handled by its own Python file, orchestrated by `main.py`.
         </DocContent>
       </DocSection>
 
-      <DocSection title="Main Application Entry Point" id="main-app">
+      <DocSection title="Core Logic (main.py)" id="core-logic">
         <DocContent>
-          The main.py file initializes the Slack Bolt app and imports all feature modules:
+          The `main.py` file is the central hub of Nova. Its most critical feature is the LLM-powered router. When a user sends a message, the `route_natural_language_query` function sends it to Gemini with a prompt that instructs the model to classify the intent and extract key parameters into a structured JSON object. This is far more flexible and powerful than traditional keyword-based command handling. It also manages conversational context in threads, deciding whether a message is a follow-up or a new command.
         </DocContent>
-        
         <CodeBlock
-          title="main.py"
+          title="main.py - LLM Router Prompt"
           language="python"
-          code={`import os
-import logging
-from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
+          code={`def route_natural_language_query(query: str):
+    prompt = f"""
+    You are an expert routing assistant. Map a user query to a tool and extract parameters.
 
-# Import feature modules
-from features.user_management import UserManagement
-from features.message_handler import MessageHandler
-from features.channel_monitor import ChannelMonitor
-from features.file_processor import FileProcessor
-from features.analytics import Analytics
-from features.notifications import Notifications
+    **RULES:**
+    1.  Default 'year' to '2025' if not specified.
+    2.  Normalize market names: "UK" should be "UK". Others should be Sentence Case.
+    3.  If a query contains "week" or "wk" followed by a number, you MUST prioritize the 'weekly-review-by-number' tool.
+    
+    **TOOLS:**
+    - 'monthly-review': For a whole month. Needs 'market', 'month_abbr', 'year'.
+    - 'analyse-influencer': For a specific influencer. Needs 'influencer_name'.
+    - 'plan': For future budget allocation. Needs 'market', 'month_abbr', 'year'.
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Initialize Slack Bolt app
-app = App(
-    token=os.environ.get("SLACK_BOT_TOKEN"),
-    signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-)
-
-class SlackApp:
-    def __init__(self, slack_app):
-        self.app = slack_app
-        self.features = {}
-        self.initialize_features()
-        
-    def initialize_features(self):
-        """Initialize all feature modules"""
-        try:
-            # Initialize feature instances
-            self.features['user_management'] = UserManagement(self.app)
-            self.features['message_handler'] = MessageHandler(self.app)
-            self.features['channel_monitor'] = ChannelMonitor(self.app)
-            self.features['file_processor'] = FileProcessor(self.app)
-            self.features['analytics'] = Analytics(self.app)
-            self.features['notifications'] = Notifications(self.app)
-            
-            logger.info("All features initialized successfully")
-            
-        except Exception as e:
-            logger.error(f"Error initializing features: {e}")
-            raise
-
-# Initialize and start the application
-if __name__ == "__main__":
-    slack_app = SlackApp(app)
-    slack_app.start()`}
+    **RESPONSE FORMAT:** JSON ONLY: '{"tool_name": "...", "parameters": {{...}}}'
+    **USER QUERY:** "{query}"
+    """
+    response = gemini_model.generate_content(prompt)
+    # ... parsing logic ...
+    return json.loads(cleaned_text)
+`}
         />
       </DocSection>
 
-      <DocSection title="Feature 1: User Management" id="feature-1">
+      <DocSection title="Monthly Review Module (month.py)" id="monthly-module">
         <DocContent>
-          Handles user registration, authentication, and profile management within Slack:
+          This module handles requests for monthly performance reviews. It follows a two-step AI generation process. First, it calls the Lyra backend to get structured JSON data for the requested month and market. Second, it constructs a new prompt for Gemini, embedding this clean data as context and asking the LLM to generate a natural language summary. This ensures the AI's response is grounded in factual, accurate data.
         </DocContent>
-        
         <CodeBlock
-          title="features/user_management.py"
+          title="month.py - Analysis Generation Prompt"
           language="python"
-          code={`import json
-from typing import Dict, List
-from slack_bolt import BoltRequest
-from datetime import datetime
-
-class UserManagement:
-    def __init__(self, app):
-        self.app = app
-        self.users_db = {}  # In production, use proper database
-        self.register_handlers()
-    
-    def register_handlers(self):
-        """Register all user management related handlers"""
-        
-        # Handle user profile command
-        @self.app.command("/profile")
-        def handle_profile_command(ack, respond, command):
-            ack()
-            user_id = command['user_id']
-            profile = self.get_user_profile(user_id)
-            
-            respond(f"👤 **Your Profile**\\n"
-                   f"User ID: {profile.get('user_id', 'N/A')}\\n"
-                   f"Role: {profile.get('role', 'Member')}\\n"
-                   f"Joined: {profile.get('joined_date', 'Unknown')}")
-    
-    def register_user(self, user_id: str, user_name: str) -> Dict:
-        """Register a new user in the system"""
-        user_profile = {
-            'user_id': user_id,
-            'user_name': user_name,
-            'role': 'member',
-            'joined_date': datetime.now().isoformat(),
-            'preferences': {
-                'notifications': True,
-                'analytics_opt_in': True
-            }
-        }
-        
-        self.users_db[user_id] = user_profile
-        return user_profile`}
+          code={`def create_prompt(user_query, market, month, year, target_budget_local, actual_data, is_full_review):
+    return f"""
+    You are Nova, a marketing analyst.
+    {"Generate a comprehensive monthly performance review." if is_full_review else "Provide a concise, direct answer."}
+    **Data Context for {market.upper()} - {month.upper()} {year}:**
+    {json.dumps({"Target Budget": format_currency(target_budget_local, market), "Actuals": actual_data}, indent=2)}
+    **User's Request:** "{user_query if user_query else "A full monthly review."}"
+    **Instructions:** Analyze the request and data. Formulate a clear, well-structured response using bold for key metrics. Present insights naturally without mentioning "based on the data provided".
+    """
+`}
         />
       </DocSection>
-
-      <DocSection title="Feature 2: Message Handler" id="feature-2">
+      
+      <DocSection title="Influencer Analysis Module (influencer.py)" id="influencer-module">
         <DocContent>
-          Processes and responds to different types of messages in Slack channels:
+          This module provides detailed performance data for a specific influencer. It dynamically adjusts its output based on the user's query. If the user asks a general question like "analyse influencer X," it generates a comprehensive deep-dive report. If the user asks a specific question, it provides a concise, direct answer, all powered by the same underlying data from Lyra.
         </DocContent>
-        
-        <CodeBlock
-          title="features/message_handler.py"
-          language="python"
-          code={`import re
-from typing import Dict, List, Optional
-from datetime import datetime
-
-class MessageHandler:
-    def __init__(self, app):
-        self.app = app
-        self.message_patterns = {}
-        self.auto_responses = {}
-        self.register_handlers()
-        self.setup_patterns()
-    
-    def register_handlers(self):
-        """Register message event handlers"""
-        
-        # Handle mentions
-        @self.app.event("app_mention")
-        def handle_app_mention(event, say):
-            message = event['text']
-            user = event['user']
-            channel = event['channel']
-            
-            response = self.process_mention(message, user, channel)
-            if response:
-                say(response)
-        
-        # Handle direct messages
-        @self.app.message("hello")
-        def handle_hello(message, say):
-            say(f"Hello <@{message['user']}>! 👋 How can I help you today?")
-    
-    def process_mention(self, message: str, user_id: str, channel_id: str) -> Optional[str]:
-        """Process app mentions and generate appropriate responses"""
-        message_lower = message.lower()
-        
-        # Check for specific patterns
-        for pattern_name, pattern in self.message_patterns.items():
-            if pattern.search(message):
-                return self.get_pattern_response(pattern_name, message, user_id)
-        
-        # Default response for unmatched mentions
-        return f"Thanks for mentioning me, <@{user_id}>! Use 'help' to see what I can do. 🤖"`}
-        />
       </DocSection>
 
-      <DocSection title="Feature 3: Channel Monitor" id="feature-3">
+      <DocSection title="Strategic Planning Module (plan.py)" id="planning-module">
         <DocContent>
-          Monitors channel activity and provides insights on usage patterns:
+          This module showcases Nova's most advanced capability: prescriptive analytics. It goes beyond reporting past performance to recommend future actions. The `run_strategic_plan` function orchestrates a complex workflow: it fetches budget and spending data, identifies already-booked influencers, queries Lyra for available high-performers, and then runs a budget allocation algorithm to create an optimized plan. The output includes both an AI-generated strategic summary in Slack and a detailed Excel file for download.
         </DocContent>
-        
         <CodeBlock
-          title="features/channel_monitor.py"
+          title="plan.py - Strategic Planning Logic"
           language="python"
-          code={`from datetime import datetime, timedelta
-from typing import Dict, List
-import json
+          code={`def run_strategic_plan(client, say, event, thread_ts, params, thread_context_store):
+    # 1. Fetch target budget and actual spend from Lyra API
+    target_budget = ...
+    actual_spend = ...
+    remaining_budget = target_budget - actual_spend
+    
+    if remaining_budget <= 0:
+        say("Budget is fully utilized.", thread_ts=thread_ts)
+        return
 
-class ChannelMonitor:
-    def __init__(self, app):
-        self.app = app
-        self.channel_stats = {}
-        self.activity_log = []
-        self.register_handlers()
+    # 2. Fetch available influencers from Gold, Silver, and Bronze tiers
+    gold, silver, bronze = fetch_tier_influencers(market, year, "gold", booked_names)
     
-    def register_handlers(self):
-        """Register channel monitoring handlers"""
-        
-        # Monitor all messages for statistics
-        @self.app.event("message")
-        def track_message_activity(event):
-            if event.get('subtype') is None:  # Ignore bot messages and subtypes
-                self.log_activity(event)
-        
-        # Channel stats command
-        @self.app.command("/channel_stats")
-        def handle_channel_stats(ack, respond, command):
-            ack()
-            channel_id = command['channel_id']
-            stats = self.get_channel_statistics(channel_id)
-            respond(self.format_channel_stats(stats))
-    
-    def log_activity(self, event: Dict):
-        """Log message activity for analysis"""
-        activity_entry = {
-            'timestamp': datetime.now().isoformat(),
-            'channel': event.get('channel'),
-            'user': event.get('user'),
-            'message_type': 'message',
-            'has_thread': 'thread_ts' in event,
-            'has_files': 'files' in event,
-            'message_length': len(event.get('text', ''))
-        }
-        
-        self.activity_log.append(activity_entry)
-        self.update_channel_stats(event.get('channel'), activity_entry)`}
-        />
-      </DocSection>
+    # 3. Allocate remaining budget to the best available influencers
+    recs, total_allocated, tier_breakdown = allocate_budget_cascading_tiers(...)
 
-      <DocSection title="Additional Features" id="feature-4">
-        <DocContent>
-          File Processor, Analytics, and Notifications modules work together to provide comprehensive functionality:
-        </DocContent>
-        
-        <CodeBlock
-          title="features/file_processor.py"
-          language="python"
-          code={`class FileProcessor:
-    def __init__(self, app):
-        self.app = app
-        self.register_handlers()
+    # 4. Generate an Excel report for download
+    excel_buffer = create_excel_report(recs, ...)
+    client.files_upload_v2(channel=channel_id, file=excel_buffer.getvalue(), ...)
     
-    def register_handlers(self):
-        @self.app.event("file_shared")
-        def handle_file_upload(event):
-            # Process uploaded files
-            pass`}
-        />
-        
-        <CodeBlock
-          title="features/analytics.py"
-          language="python"
-          code={`class Analytics:
-    def __init__(self, app):
-        self.app = app
-        self.metrics = {}
-    
-    def track_event(self, event_type, data):
-        # Track user interactions and generate insights
-        pass`}
-        />
-        
-        <CodeBlock
-          title="features/notifications.py"
-          language="python"
-          code={`class Notifications:
-    def __init__(self, app):
-        self.app = app
-        self.notification_queue = []
-    
-    def send_notification(self, user_id, message):
-        # Send notifications to users
-        pass`}
+    # 5. Generate an AI-powered summary of the plan
+    prompt, report_text = create_llm_prompt(...)
+    response = gemini_model.generate_content(prompt)
+    say(text=report_text + "\\n" + response.text, thread_ts=thread_ts)`}
         />
       </DocSection>
     </DocLayout>
