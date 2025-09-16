@@ -24,8 +24,19 @@ export default function Index() {
 
       <DocSection title="System Architecture" id="architecture">
         <DocContent>
-          The platform is built on a robust, three-tiered architecture that ensures a clear separation of concerns, scalability, and maintainability.
+          The platform is built on a robust, three-tiered architecture that ensures a clear separation of concerns, scalability, and maintainability. The diagram below illustrates the end-to-end flow of data and interaction within the system.
         </DocContent>
+
+        <div className="my-8 p-4 border border-border rounded-lg bg-muted/10 shadow-md">
+          <img
+            src="/architecture.png"
+            alt="System Architecture Diagram"
+            className="w-full rounded-md object-contain"
+          />
+          <p className="mt-4 text-center text-sm text-muted-foreground italic">
+            End-to-end data flow from source ingestion to conversational AI.
+          </p>
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 my-8">
           <Card className="border-border bg-gradient-to-br from-card via-card to-muted/20">
