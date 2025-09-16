@@ -1,6 +1,9 @@
 import { DocLayout } from "@/components/DocLayout";
 import { DocSection, DocContent } from "@/components/DocSection";
 import { CodeBlock } from "@/components/CodeBlock";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const navigation = [
   { id: "overview", label: "Overview", href: "#overview" },
@@ -13,6 +16,13 @@ const navigation = [
 export default function Frontend() {
   return (
     <DocLayout title="Nova: The Conversational Frontend" navigation={navigation}>
+      <Link to="/" className="mb-8 inline-block">
+        <Button variant="outline">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Overview
+        </Button>
+      </Link>
+      
       <DocSection title="Nova Overview" id="overview">
         <DocContent>
           Nova is the user-facing component of the platform, implemented as a sophisticated Slack bot using the Slack Bolt framework. It serves as an intelligent conversational interface, allowing users to query complex marketing data using natural language. Nova's primary innovation lies in its use of a Large Language Model (Google's Gemini) to understand user intent, fetch structured data from the Lyra backend, and then generate insightful, human-readable analysis. The application is modular, with each core capability handled by its own Python file, orchestrated by `main.py`.
