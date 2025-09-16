@@ -35,7 +35,7 @@ export default function Frontend() {
         <DocContent>
           The `main.py` file is the central hub of Nova. Its most critical feature is the LLM-powered router. When a user sends a message, `route_natural_language_query` sends it to Gemini with a carefully engineered prompt. This instructs the model to classify the user's intent and extract key parameters into a structured JSON object.
           <br/><br/>
-          <strong>CTO Insight:</strong> Using an LLM as a router for intent classification and entity extraction is a modern, highly scalable approach. It's far more flexible and resilient to variations in user phrasing than traditional, brittle keyword or regex-based systems. The context handling in threads creates a seamless user experience.
+          <strong>  Insight:</strong> Using an LLM as a router for intent classification and entity extraction is a modern, highly scalable approach. It's far more flexible and resilient to variations in user phrasing than traditional, brittle keyword or regex-based systems. The context handling in threads creates a seamless user experience.
         </DocContent>
         <CodeBlock
           title="main.py - LLM Router Prompt"
@@ -68,7 +68,7 @@ export default function Frontend() {
         <DocContent>
           This module handles requests for monthly performance reviews. It orchestrates calls to two different `sources` in the Lyra backend to gather both target and actual performance data. It then uses the "fact-grounded generation" pattern to produce a reliable AI summary.
            <br/><br/>
-          <strong>CTO Insight:</strong> This two-step AI process is a key architectural pattern. The system uses the LLM for what it's best at—natural language generation and summarization—while relying on the robust, deterministic Lyra backend for all calculations. This prevents factual errors and hallucinations.
+          <strong>  Insight:</strong> This two-step AI process is a key architectural pattern. The system uses the LLM for what it's best at—natural language generation and summarization—while relying on the robust, deterministic Lyra backend for all calculations. This prevents factual errors and hallucinations.
         </DocContent>
         <CodeBlock
           title="month.py - Fetching Data and Constructing Lyra Payload"
@@ -151,7 +151,7 @@ export default function Frontend() {
         <DocContent>
           This module generates leaderboard-style reports. It calls Lyra's `discovery_tiers` view and then programmatically formats the data into clean, text-based tables for Slack.
           <br/><br/>
-          <strong>CTO Insight:</strong> This module demonstrates pragmatic design choices. Instead of using an LLM to generate a table (which can be unreliable), it uses Python's string formatting for a deterministic, perfectly structured output. It uses the right tool for the job.
+          <strong>  Insight:</strong> This module demonstrates pragmatic design choices. Instead of using an LLM to generate a table (which can be unreliable), it uses Python's string formatting for a deterministic, perfectly structured output. It uses the right tool for the job.
         </DocContent>
         <CodeBlock
           title="trend.py - Generating Formatted Leaderboards"
@@ -177,7 +177,7 @@ export default function Frontend() {
         <DocContent>
           The `plan.py` module is the platform's most advanced feature, providing prescriptive analytics. It orchestrates multiple API calls to Lyra to build a comprehensive picture of the current budget situation and available talent, then runs a custom allocation algorithm to recommend how to spend the remaining budget.
           <br/><br/>
-          <strong>CTO Insight:</strong> This module delivers immense business value by translating data directly into actionable strategy. The function demonstrates a complex orchestration of multiple API calls, data filtering, a core allocation algorithm, and multi-format output generation (Slack message + Excel file), showcasing a complete, feature-rich vertical slice of the application.
+          <strong>  Insight:</strong> This module delivers immense business value by translating data directly into actionable strategy. The function demonstrates a complex orchestration of multiple API calls, data filtering, a core allocation algorithm, and multi-format output generation (Slack message + Excel file), showcasing a complete, feature-rich vertical slice of the application.
         </DocContent>
         <CodeBlock
           title="plan.py - Strategic Planning Orchestration"
