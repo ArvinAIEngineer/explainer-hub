@@ -1,6 +1,9 @@
 import { DocLayout } from "@/components/DocLayout";
 import { DocSection, DocContent } from "@/components/DocSection";
 import { CodeBlock } from "@/components/CodeBlock";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const navigation = [
   { id: "overview", label: "Overview", href: "#overview" },
@@ -13,6 +16,13 @@ const navigation = [
 export default function Backend() {
   return (
     <DocLayout title="Lyra: The Backend Analytics Engine" navigation={navigation}>
+      <Link to="/" className="mb-8 inline-block">
+        <Button variant="outline">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Overview
+        </Button>
+      </Link>
+      
       <DocSection title="Lyra Engine Overview" id="overview">
         <DocContent>
           Lyra is the computational brain of the platform. It is a backend service built with Python, using the Flask web framework and the powerful Pandas library for data manipulation. Its primary role is not just to serve data, but to perform all the heavy lifting: pre-calculating complex metrics, aggregating data across different markets, and transforming raw numbers into structured, ready-to-consume insights for the Nova conversational layer.
