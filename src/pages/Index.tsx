@@ -2,7 +2,7 @@ import { DocLayout } from "@/components/DocLayout";
 import { DocSection, DocContent } from "@/components/DocSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Database, Server, MessageSquare, ArrowRight } from "lucide-react";
+import { Database, Server, MessageSquare, ArrowRight, Github } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const navigation = [
@@ -76,12 +76,20 @@ export default function Index() {
               <p className="text-sm text-muted-foreground mb-4">
                 The computational core of the system. Lyra performs complex calculations, currency conversions, and data aggregations, exposing insights via a REST API.
               </p>
-              <Link to="/backend">
-                <Button variant="outline" size="sm" className="w-full group">
-                  View Backend Details 
-                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Link to="/backend">
+                  <Button variant="outline" size="sm" className="w-full group">
+                    View Backend Details 
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <a href="https://github.com/Arvin-BrandInfluencer/Lyra-Final" target="_blank" rel="noopener noreferrer">
+                  <Button variant="secondary" size="sm" className="w-full">
+                    <Github className="h-4 w-4 mr-2" />
+                    View Full Code
+                  </Button>
+                </a>
+              </div>
             </CardContent>
           </Card>
 
@@ -99,12 +107,20 @@ export default function Index() {
               <p className="text-sm text-muted-foreground mb-4">
                 An intelligent Slack bot that understands natural language queries, fetches data from Lyra, and delivers AI-generated analysis and reports to users.
               </p>
-              <Link to="/frontend">
-                <Button variant="outline" size="sm" className="w-full group">
-                  View Frontend Details 
-                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Link to="/frontend">
+                  <Button variant="outline" size="sm" className="w-full group">
+                    View Frontend Details 
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <a href="https://github.com/Arvin-BrandInfluencer/NOVA-Slack" target="_blank" rel="noopener noreferrer">
+                  <Button variant="secondary" size="sm" className="w-full">
+                    <Github className="h-4 w-4 mr-2" />
+                    View Full Code
+                  </Button>
+                </a>
+              </div>
             </CardContent>
           </Card>
         </div>
