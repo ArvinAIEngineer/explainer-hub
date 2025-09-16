@@ -33,7 +33,7 @@ export default function Frontend() {
         <DocContent>
           The `main.py` file is the central hub of Nova. Its most critical feature is the LLM-powered router. When a user sends a message, `route_natural_language_query` sends it to Gemini with a carefully engineered prompt. This instructs the model to act as a router, classifying the user's intent and extracting key parameters into a structured JSON object. It also manages conversational context in threads, deciding whether a message is a follow-up or a new command.
           <br/><br/>
-          <strong>CTO Insight:</strong> Using an LLM as a router for intent classification and entity extraction is a modern, highly scalable approach. It's far more flexible and resilient to variations in user phrasing than traditional, brittle keyword or regex-based systems. The context handling in threads creates a seamless user experience.
+          <strong>  Insight:</strong> Using an LLM as a router for intent classification and entity extraction is a modern, highly scalable approach. It's far more flexible and resilient to variations in user phrasing than traditional, brittle keyword or regex-based systems. The context handling in threads creates a seamless user experience.
         </DocContent>
         <CodeBlock
           title="main.py - LLM Router Prompt"
@@ -67,7 +67,7 @@ export default function Frontend() {
         <DocContent>
           Modules like `month.py` and `influencer.py` handle specific analytical requests. They follow a two-step AI generation process. First, they call the Lyra backend to get structured JSON data. Second, they construct a new prompt for Gemini, embedding this clean data as context and asking the LLM to generate a natural language summary.
           <br/><br/>
-          <strong>CTO Insight:</strong> This "fact-grounded generation" pattern is crucial for enterprise AI. It prevents the LLM from hallucinating or making up data by forcing it to base its analysis solely on the accurate, pre-calculated data provided from the Lyra backend. The AI is used for presentation and interpretation, not for calculation.
+          <strong>  Insight:</strong> This "fact-grounded generation" pattern is crucial for enterprise AI. It prevents the LLM from hallucinating or making up data by forcing it to base its analysis solely on the accurate, pre-calculated data provided from the Lyra backend. The AI is used for presentation and interpretation, not for calculation.
         </DocContent>
         <CodeBlock
           title="month.py - Analysis Generation Prompt"
@@ -92,7 +92,7 @@ export default function Frontend() {
         <DocContent>
           The `plan.py` module elevates Nova from a descriptive analytics tool to a prescriptive one. It doesn't just report what happened; it recommends what to do next. The `run_strategic_plan` function orchestrates a complex workflow to generate a data-driven budget allocation plan.
           <br/><br/>
-          <strong>CTO Insight:</strong> This module delivers immense business value. It directly translates data into actionable strategy. The function demonstrates a complex orchestration of multiple API calls, data filtering, a core allocation algorithm, and multi-format output generation (Slack message + Excel file), showcasing a complete, feature-rich vertical slice of the application.
+          <strong>  Insight:</strong> This module delivers immense business value. It directly translates data into actionable strategy. The function demonstrates a complex orchestration of multiple API calls, data filtering, a core allocation algorithm, and multi-format output generation (Slack message + Excel file), showcasing a complete, feature-rich vertical slice of the application.
         </DocContent>
         <CodeBlock
           title="plan.py - Strategic Planning Logic"
@@ -131,7 +131,7 @@ export default function Frontend() {
         <DocContent>
           The frontend logic is validated with `pytest` and extensive use of mocking to isolate components and test complex interactions with external services like the Lyra API and the Gemini LLM.
           <br/><br/>
-          <strong>CTO Insight:</strong> Testing an AI-driven, multi-service application is non-trivial. The presence of tests that mock external dependencies demonstrates an understanding of modern testing practices for complex systems and ensures that individual modules can be validated independently.
+          <strong>  Insight:</strong> Testing an AI-driven, multi-service application is non-trivial. The presence of tests that mock external dependencies demonstrates an understanding of modern testing practices for complex systems and ensures that individual modules can be validated independently.
         </DocContent>
         <CodeBlock
           title="tests/test_plan.py"
