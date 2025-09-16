@@ -4,325 +4,129 @@ import { CodeBlock } from "@/components/CodeBlock";
 
 const navigation = [
   { id: "overview", label: "Overview", href: "#overview" },
-  { id: "main-app", label: "Main Application", href: "#main-app" },
-  { id: "api-endpoints", label: "API Endpoints", href: "#api-endpoints" },
-  { id: "database", label: "Database Models", href: "#database" },
-  { id: "middleware", label: "Middleware", href: "#middleware" },
+  { id: "architecture", label: "Architecture", href: "#architecture" },
+  { id: "routes", label: "Routes (routes.py)", href: "#routes" },
+  { id: "data-service", label: "Data Service (data_service.py)", href: "#data-service" },
+  { id: "processing-service", label: "Processing Service (processing_service.py)", href: "#processing-service" },
 ];
 
 export default function Backend() {
   return (
-    <DocLayout title="FastAPI Backend Documentation" navigation={navigation}>
-      <DocSection title="Backend Overview" id="overview">
+    <DocLayout title="Lyra: The Backend Analytics Engine" navigation={navigation}>
+      <DocSection title="Lyra Engine Overview" id="overview">
         <DocContent>
-          The backend is built as a single FastAPI file that handles all API endpoints, 
-          database operations, and business logic. This monolithic approach keeps the 
-          backend simple and easy to deploy while maintaining good separation of concerns 
-          through function organization.
+          Lyra is the computational brain of the platform. It is a backend service built with Python, using the Flask web framework and the powerful Pandas library for data manipulation. Its primary role is not just to serve data, but to perform all the heavy lifting: pre-calculating complex metrics, aggregating data across different markets, and transforming raw numbers into structured, ready-to-consume insights for the Nova conversational layer.
         </DocContent>
       </DocSection>
 
-      <DocSection title="Main Application Structure" id="main-app">
+      <DocSection title="Core Architecture" id="architecture">
         <DocContent>
-          Here's the main FastAPI application setup with all dependencies and configuration:
+          Lyra follows a clean, service-oriented architecture to maintain a strong separation of concerns. This makes the codebase modular, testable, and easy to maintain. The structure is divided into logical layers, each with a specific responsibility.
         </DocContent>
-        
+      </DocSection>
+      
+      <DocSection title="Routes Layer (app/routes.py)" id="routes">
+        <DocContent>
+          The routes layer defines the API surface. A key architectural choice was to use a single, unified endpoint (`/api/influencer/query`). This endpoint acts as a gateway, routing requests to the appropriate service based on the `source` parameter in the JSON payload. This simplifies the frontend integration significantly, as Nova only needs to construct different payloads for one endpoint.
+        </DocContent>
         <CodeBlock
-          title="main.py"
+          title="app/routes.py"
           language="python"
-          code={`from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
-from typing import List, Optional
-import uvicorn
-import asyncio
-from datetime import datetime
-import logging
+          code={`@app.route('/api/influencer/query', methods=['POST'])
+def handle_influencer_query():
+    """Main query endpoint that routes requests based on the 'source' parameter."""
+    try:
+        payload = request.get_json(silent=True)
+        source = payload.get("source")
+        logger.info(f"Routing request for source: '{source}'")
 
-# Initialize FastAPI app
-app = FastAPI(
-    title="Code Documentation API",
-    description="Backend API for the code documentation system",
-    version="1.0.0"
-)
+        if source == "dashboard":
+            result = data_service.get_dashboard_data(payload)
+        elif source == "influencer_analytics":
+            result = data_service.get_analytics_data(payload)
+        else:
+            result = {"error": f"Invalid 'source'."}
+        
+        return jsonify(result)
 
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Security
-security = HTTPBearer()
-
-# Logging configuration
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Pydantic models
-class DocumentRequest(BaseModel):
-    title: str
-    content: str
-    category: str
-    tags: List[str] = []
-
-class DocumentResponse(BaseModel):
-    id: int
-    title: str
-    content: str
-    category: str
-    tags: List[str]
-    created_at: datetime
-    updated_at: datetime
-
-class UserModel(BaseModel):
-    username: str
-    email: str
-    role: str = "user"
-
-# In-memory storage (replace with database in production)
-documents_db = []
-users_db = []
-document_id_counter = 1
-
-@app.on_event("startup")
-async def startup_event():
-    logger.info("Starting FastAPI application")
-    # Initialize any startup tasks here
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info("Shutting down FastAPI application")
-    # Cleanup tasks here`}
+    except Exception as e:
+        logger.critical(f"An unhandled exception occurred: {e}")
+        return jsonify({"error": f"An internal server error occurred: {str(e)}"}), 500`}
         />
       </DocSection>
 
-      <DocSection title="API Endpoints" id="api-endpoints">
+      <DocSection title="Data Service Layer (app/services/data_service.py)" id="data-service">
         <DocContent>
-          Core API endpoints for document management and user operations:
+          This layer is the bridge to the Supabase database. It abstracts away all database interactions, constructing and executing queries dynamically based on filters from the request payload. It queries pre-defined, performant SQL Views (e.g., `all_influencer_campaigns`) and returns the raw data as a Pandas DataFrame, ready for processing.
         </DocContent>
-        
         <CodeBlock
-          title="API Routes"
+          title="app/services/data_service.py"
           language="python"
-          code={`# Health check endpoint
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now()}
+          code={`def get_analytics_data(payload: Dict[str, Any]):
+    """Fetches data for the analytics source and routes to processing."""
+    logger.info("Starting analytics data request from view.")
+    try:
+        filters = payload.get("filters", {})
+        query = supabase.from_(CAMPAIGN_VIEW_NAME).select("*")
 
-# Document endpoints
-@app.post("/api/documents", response_model=DocumentResponse)
-async def create_document(
-    document: DocumentRequest,
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    global document_id_counter
-    
-    new_document = {
-        "id": document_id_counter,
-        "title": document.title,
-        "content": document.content,
-        "category": document.category,
-        "tags": document.tags,
-        "created_at": datetime.now(),
-        "updated_at": datetime.now()
-    }
-    
-    documents_db.append(new_document)
-    document_id_counter += 1
-    
-    logger.info(f"Created document: {new_document['id']}")
-    return new_document
-
-@app.get("/api/documents", response_model=List[DocumentResponse])
-async def get_documents(
-    category: Optional[str] = None,
-    tag: Optional[str] = None,
-    limit: int = 100
-):
-    filtered_docs = documents_db
-    
-    if category:
-        filtered_docs = [doc for doc in filtered_docs if doc["category"] == category]
-    
-    if tag:
-        filtered_docs = [doc for doc in filtered_docs if tag in doc["tags"]]
-    
-    return filtered_docs[:limit]
-
-@app.get("/api/documents/{document_id}", response_model=DocumentResponse)
-async def get_document(document_id: int):
-    document = next((doc for doc in documents_db if doc["id"] == document_id), None)
-    if not document:
-        raise HTTPException(status_code=404, detail="Document not found")
-    return document
-
-@app.put("/api/documents/{document_id}", response_model=DocumentResponse)
-async def update_document(
-    document_id: int,
-    document_update: DocumentRequest,
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    document = next((doc for doc in documents_db if doc["id"] == document_id), None)
-    if not document:
-        raise HTTPException(status_code=404, detail="Document not found")
-    
-    document.update({
-        "title": document_update.title,
-        "content": document_update.content,
-        "category": document_update.category,
-        "tags": document_update.tags,
-        "updated_at": datetime.now()
-    })
-    
-    logger.info(f"Updated document: {document_id}")
-    return document
-
-@app.delete("/api/documents/{document_id}")
-async def delete_document(
-    document_id: int,
-    credentials: HTTPAuthorizationCredentials = Depends(security)
-):
-    global documents_db
-    documents_db = [doc for doc in documents_db if doc["id"] != document_id]
-    logger.info(f"Deleted document: {document_id}")
-    return {"message": "Document deleted successfully"}`}
+        if influencer_name := filters.get("influencer_name"):
+            query = query.ilike('influencer_name', f'%{influencer_name.strip()}%')
+        if market := filters.get("market", "All"):
+            if market != "All":
+                markets_to_filter = NORDIC_COUNTRIES if market == "Nordics" else [market]
+                query = query.in_('market', markets_to_filter)
+        
+        response = query.execute()
+        df = pd.DataFrame(response.data)
+        
+        return processing_service.route_analytics_processing(df, payload)
+    except Exception as e:
+        return {"error": f"Influencer Analytics query failed: {str(e)}"}`}
         />
       </DocSection>
-
-      <DocSection title="Database Models" id="database">
+      
+      <DocSection title="Processing Service (app/services/processing_service.py)" id="processing-service">
         <DocContent>
-          Database models and data access patterns (currently using in-memory storage):
+          This is the core of Lyra's intelligence. It contains all business logic and uses Pandas to perform complex data transformations. It routes incoming DataFrames to the correct function based on the `view` parameter and executes calculations like multi-currency aggregation for Nordics markets and performance-based influencer tiering.
         </DocContent>
-        
         <CodeBlock
-          title="Database Operations"
+          title="Processing Service - Request Routing"
           language="python"
-          code={`# Database utility functions
-class DatabaseManager:
-    def __init__(self):
-        self.documents = []
-        self.users = []
-        self.categories = []
-    
-    async def create_document(self, document_data: dict) -> dict:
-        """Create a new document in the database"""
-        document_data["id"] = len(self.documents) + 1
-        document_data["created_at"] = datetime.now()
-        document_data["updated_at"] = datetime.now()
-        
-        self.documents.append(document_data)
-        return document_data
-    
-    async def get_documents_by_category(self, category: str) -> List[dict]:
-        """Retrieve documents by category"""
-        return [doc for doc in self.documents if doc.get("category") == category]
-    
-    async def search_documents(self, query: str) -> List[dict]:
-        """Search documents by title or content"""
-        query_lower = query.lower()
-        return [
-            doc for doc in self.documents 
-            if query_lower in doc.get("title", "").lower() 
-            or query_lower in doc.get("content", "").lower()
-        ]
-    
-    async def get_document_stats(self) -> dict:
-        """Get database statistics"""
-        categories = {}
-        for doc in self.documents:
-            category = doc.get("category", "uncategorized")
-            categories[category] = categories.get(category, 0) + 1
-        
-        return {
-            "total_documents": len(self.documents),
-            "total_users": len(self.users),
-            "categories": categories,
-            "last_updated": max([doc["updated_at"] for doc in self.documents]) if self.documents else None
-        }
+          code={`def route_analytics_processing(df: pd.DataFrame, payload: Dict[str, Any]):
+    """Cleans the analytics DataFrame and routes it to the correct processing function."""
+    view = payload.get("view", "summary")
+    filters = payload.get("filters", {})
 
-# Initialize database manager
-db_manager = DatabaseManager()
-
-# Database dependency
-async def get_database():
-    return db_manager`}
+    if "influencer_name" in filters:
+        return _influencer_process_profile(df, filters.get("influencer_name"))
+    if view == "summary":
+        return _influencer_process_summary(df, payload)
+    if view == "discovery_tiers":
+        return _influencer_process_discovery_tiers(df, payload)
+    # ... other views ...
+    
+    return {"error": f"Invalid view '{view}'."}`}
         />
-      </DocSection>
-
-      <DocSection title="Middleware & Utilities" id="middleware">
-        <DocContent>
-          Custom middleware for authentication, logging, and error handling:
-        </DocContent>
-        
         <CodeBlock
-          title="Middleware"
+          title="Processing Service - Influencer Tiering Example"
           language="python"
-          code={`from fastapi import Request, Response
-from fastapi.responses import JSONResponse
-import time
-import uuid
-
-# Request ID middleware
-@app.middleware("http")
-async def add_request_id(request: Request, call_next):
-    request_id = str(uuid.uuid4())
-    request.state.request_id = request_id
+          code={`def _influencer_process_discovery_tiers(df: pd.DataFrame, payload: dict):
+    """Processes data for the discovery tiers view."""
+    summary_result = _influencer_process_summary(df, {})
+    grouped = pd.DataFrame(summary_result["items"])
     
-    response = await call_next(request)
-    response.headers["X-Request-ID"] = request_id
-    return response
-
-# Logging middleware
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    start_time = time.time()
+    zero_cac = grouped[grouped['effective_cac_eur'] <= 0]
+    ranked = grouped[grouped['effective_cac_eur'] > 0].sort_values(by='effective_cac_eur', ascending=True)
+    count = len(ranked)
     
-    logger.info(f"Request: {request.method} {request.url}")
+    top_third_index = math.ceil(count / 3)
+    mid_third_index = math.ceil(count * 2 / 3)
     
-    response = await call_next(request)
+    gold_df = ranked.iloc[:top_third_index]
+    silver_df = ranked.iloc[top_third_index:mid_third_index]
+    bronze_df = pd.concat([ranked.iloc[mid_third_index:], zero_cac])
     
-    process_time = time.time() - start_time
-    logger.info(f"Response: {response.status_code} - {process_time:.4f}s")
-    
-    return response
-
-# Error handling
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    logger.error(f"Global exception: {exc}")
-    return JSONResponse(
-        status_code=500,
-        content={
-            "detail": "Internal server error",
-            "request_id": getattr(request.state, "request_id", None)
-        }
-    )
-
-# Authentication utility
-async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
-    """Verify JWT token (simplified for demo)"""
-    token = credentials.credentials
-    
-    # In production, verify JWT token properly
-    if not token or token == "invalid":
-        raise HTTPException(status_code=401, detail="Invalid token")
-    
-    return {"user_id": "demo_user", "role": "admin"}
-
-# Run the application
-if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )`}
+    return { "gold": gold_df.to_dict(orient='records'), "silver": silver_df.to_dict(orient='records'), "bronze": bronze_df.to_dict(orient='records') }`}
         />
       </DocSection>
     </DocLayout>
