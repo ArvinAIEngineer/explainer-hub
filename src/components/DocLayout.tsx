@@ -30,19 +30,21 @@ export const DocLayout = ({ children, title = "Code Documentation", navigation =
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-gradient-to-r from-background/95 to-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center">
           <Button
             variant="ghost"
             size="sm"
-            className="mr-4 lg:hidden"
+            className="mr-4 lg:hidden hover:bg-primary/20"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
             {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
-          <div className="flex items-center space-x-2">
-            <Code2 className="h-6 w-6 text-primary" />
-            <span className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-gradient-hero">
+              <Code2 className="h-5 w-5 text-white" />
+            </div>
+            <span className="font-bold text-xl bg-gradient-primary bg-clip-text text-transparent">
               {title}
             </span>
           </div>
@@ -52,18 +54,23 @@ export const DocLayout = ({ children, title = "Code Documentation", navigation =
       <div className="container flex">
         {/* Sidebar */}
         <aside className={cn(
-          "w-64 shrink-0 border-r border-border bg-muted/10 p-6",
+          "w-64 shrink-0 border-r border-border bg-gradient-to-b from-muted/20 to-muted/5 p-6",
           "lg:block",
           sidebarOpen ? "block" : "hidden"
         )}>
-          <nav className="space-y-1">
-            {navItems.map((item) => (
+          <nav className="space-y-2">
+            {navItems.map((item, index) => (
               <a
                 key={item.id}
                 href={item.href}
-                className="block rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                className="group block rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-all duration-200 hover:bg-gradient-to-r hover:from-primary/10 hover:to-accent/10 border border-transparent hover:border-primary/20"
+                style={{
+                  animationDelay: `${index * 100}ms`
+                }}
               >
-                {item.label}
+                <span className="group-hover:bg-gradient-accent group-hover:bg-clip-text group-hover:text-transparent transition-all duration-200">
+                  {item.label}
+                </span>
               </a>
             ))}
           </nav>

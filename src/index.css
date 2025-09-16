@@ -15,16 +15,16 @@
     --popover: 240 5% 6%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 221 83% 53%;
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 240 4% 16%;
+    --secondary: 197 71% 52%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 5% 6%;
     --muted-foreground: 240 5% 64.9%;
 
-    --accent: 240 4% 16%;
+    --accent: 142 71% 45%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -40,19 +40,21 @@
     --code-foreground: 0 0% 95%;
     
     /* Syntax highlighting */
-    --syntax-keyword: 267 83% 73%;
-    --syntax-string: 135 70% 60%;
-    --syntax-number: 31 90% 60%;
+    --syntax-keyword: 283 89% 74%;
+    --syntax-string: 158 64% 52%;
+    --syntax-number: 31 90% 70%;
     --syntax-comment: 240 5% 50%;
-    --syntax-function: 197 100% 70%;
+    --syntax-function: 197 92% 75%;
     
     /* Content areas */
     --content-bg: 240 7% 7%;
     --content-border: 240 6% 16%;
     
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(221 83% 53%), hsl(262 83% 58%));
-    --gradient-code: linear-gradient(135deg, hsl(240 6% 10%), hsl(240 7% 12%));
+    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(197 71% 52%), hsl(142 71% 45%));
+    --gradient-code: linear-gradient(135deg, hsl(240 6% 10%), hsl(262 83% 8%));
+    --gradient-accent: linear-gradient(90deg, hsl(197 71% 52%), hsl(142 71% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(197 71% 52%) 50%, hsl(142 71% 45%) 100%);
     
     /* Typography */
     --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
